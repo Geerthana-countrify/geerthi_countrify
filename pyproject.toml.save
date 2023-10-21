@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "customer-details"
+name = "eventstore"
 version = "0.1.0"
 description = ""
 authors = ["geerthana-countrify <geerthana@countrify.app>"]
