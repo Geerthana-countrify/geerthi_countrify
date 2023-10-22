@@ -14,32 +14,35 @@ def replay(event_id):
         count = cursor.fetchone()[0]
 
         if count > 0:
-            cursor.execute("SELECT * FROM eventstore WHERE event_id = ?", (event_id,))
+            cursor.execute("SELECT * FROM eventstore WHERE (event_id = ? ) AND version = (SELECT max(cast(version as INTEGER)) FROM eventstore WHERE event_id = ? );", (event_id, event_id,))
             existing_data = cursor.fetchone()
             current_version = int(existing_data[8])
             new_version = current_version + 1
-            new_event_id = str(uuid.uuid4())
+            new_event_id = str(uuid.uuid4()).replace("-", "")
             insert_query = """
             INSERT INTO eventstore (
                 event_id, timestamp, event_type, subdomain, userid,
                 data, corelation_id, causation_id, version, process_status, trace_id
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, DATETIME('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
             values = (
-                new_event_id, existing_data[1], existing_data[2], existing_data[3],
+                new_event_id, existing_data[2], existing_data[3],
                 existing_data[4], existing_data[5], existing_data[6],
                 existing_data[7], str(new_version), "N", existing_data[10]
             )
             cursor.execute(insert_query, values)
+
+            connection.commit()
+            cursor.close()
+            connection.close()
+            
         else:
-            return jsonify({'message':f"Event with event_id '{event_id}' created sucessfully"}), 201
-        connection.commit()
+            return jsonify({'message': f"Event with event_id '{event_id}' does not exist."}), 404
+        
     except sqlite3.Error as e:
-        return {'error': "Database error"}
-    finally:
-        cursor.close()
-        connection.close()
+        return jsonify({'error': 'Database error'}), 500
+
 
 @app.route('/<event_id>', methods=['GET'])
 def get_updated_event_id(event_id):
