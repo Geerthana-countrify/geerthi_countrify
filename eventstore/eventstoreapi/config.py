@@ -1,1 +1,1 @@
-filepath = "/home/geerthikumar/countrify/var/eventstore.db"
+filepath = "/home/geerthikumar/countrify/var/"
