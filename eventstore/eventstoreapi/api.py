@@ -1,11 +1,10 @@
 from flask import Flask, request, jsonify, Blueprint
 import sqlite3
 from lib import util
-import db_connection
+from lib import db_connection
 app = Flask(__name__)
-app_blueprints = Blueprint('app_routes' ,__name__)
 
-@app_blueprints.route('/<event_id>', methods=['GET'])
+@app.route('/<event_id>', methods=['GET'])
 def get_updated_event_id(event_id):
     try:
         connection, cursor = db_connection.connect_to_database('eventstore')
@@ -39,7 +38,7 @@ def get_updated_event_id(event_id):
     return jsonify(event_data)
 
 
-@app_blueprints.route('/create_event', methods=['POST', 'PUT'])
+@app.route('/create_event', methods=['POST', 'PUT'])
 def insert_data():
     try:
         event_id = request.json.get('event_id')

@@ -1,9 +1,9 @@
 from flask import jsonify
 import config
-filepath = config.filepath
 import uuid
 import sqlite3
-import db_connection
+from lib import db_connection
+filepath = config.filepath
 def replay(event_id):
     try:
         connection, cursor = db_connection.connect_to_database('eventstore')
