@@ -1,6 +1,3 @@
-from flask import Flask
-# from api import *
-# from flask import Flask
 from api import app
 from config import filepath
 
