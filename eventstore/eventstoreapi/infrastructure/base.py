@@ -10,27 +10,115 @@ class UnitOfWork(ABC):
         pass
 
 class Repository(ABC):
-    @abstractmethod
-    def insert(self, query, value):
-        pass
+    def __init__(self, connection):
+        self.connection = connection
 
-    @abstractmethod
-    def update(self, query, value):
-        pass
+    def insert(self, query, value=None):
+        cursor = self.connection.cursor()
+        try:
+            if value is None:
+                cursor.execute(query)
+            else:
+                cursor.execute(query, value)
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            cursor.close()
+        
+    def update(self, query, value=None):
+        cursor = self.connection.cursor()
+        try:
+            if value is None:
+                cursor.execute(query)
+            else:
+                cursor.execute(query, value)
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            cursor.close()         
+        
 
-    @abstractmethod
-    def delete(self, query, value):
-        pass
+    def delete(self, query, value=None):
+        cursor = self.connection.cursor()
+        try:
+            if value is None:
+                cursor.execute(query)
+            else:
+                cursor.execute(query, value)
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            cursor.close()        
+        
 
-    @abstractmethod
-    def get(self, query, value):
-        pass
+    def get(self, query, value=None):
+        print(self.connection)
+        cursor = self.connection.cursor()
+        print(cursor)
+        result = None
+        try:
+            if value is None:
+                cursor.execute(query)
+            else:
+                cursor.execute(query, value)
+            result = cursor.fetchone()
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            cursor.close()
+        return result
 
-    @abstractmethod
     def commit(self):
+        self.connection.commit()
         pass
-
-    @abstractmethod
     def rollback(self):
-        pass
+        self.connection.rollback()
+        pass    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # @abstractmethod
+    # def insert(self, query, value):
+    #     pass
+
+    # @abstractmethod
+    # def update(self, query, value):
+    #     pass
+
+    # @abstractmethod
+    # def delete(self, query, value):
+    #     pass
+
+    # @abstractmethod
+    # def get(self, query, value):
+    #     pass
+
+    # @abstractmethod
+    # def commit(self):
+    #     pass
+
+    # @abstractmethod
+    # def rollback(self):
+    #     pass
 

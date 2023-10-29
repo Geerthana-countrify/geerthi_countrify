@@ -1,76 +1,5 @@
 from infrastructure.base import UnitOfWork, Repository
-import sqlite3
-from lib import db_connection
-
-class SQLiteRepository(Repository):
-    def __init__(self, connection):
-        self.connection = connection
-
-    def insert(self, query, value):
-        cursor = self.connection.cursor()
-        try:
-            if value is None:
-                cursor.execute(query)
-            else:
-                cursor.execute(query, value)
-        except Exception as e:
-            print(f"Error: {e}")
-        finally:
-            cursor.close()
-        
-    def update(self, query, value):
-        cursor = self.connection.cursor()
-        try:
-            if value is None:
-                cursor.execute(query)
-            else:
-                cursor.execute(query, value)
-        except Exception as e:
-            print(f"Error: {e}")
-        finally:
-            cursor.close()         
-        
-
-    def delete(self, query, value):
-        cursor = self.connection.cursor()
-        try:
-            if value is None:
-                cursor.execute(query)
-            else:
-                cursor.execute(query, value)
-        except Exception as e:
-            print(f"Error: {e}")
-        finally:
-            cursor.close()        
-        
-
-    def get(self, query, value):
-        print(self.connection)
-        cursor = self.connection.cursor()
-        print(cursor)
-        try:
-            if value is None:
-                cursor.execute(query)
-            else:
-                cursor.execute(query, value)
-            result = cursor.fetchone()
-            if result is None:
-                return None
-            return result
-            
-        except Exception as e:
-            print(f"Error: {e}")
-            return None
-        finally:
-            cursor.close()
-
-    def commit(self):
-        self.connection.commit()
-        pass
-    def rollback(self):
-        self.connection.rollback()
-        pass
-       
+import sqlite3      
 
 class SQLiteUnitOfWork(UnitOfWork):
     _instance = None
@@ -88,7 +17,7 @@ class SQLiteUnitOfWork(UnitOfWork):
     def connect(self):
         filepath = self.path + self.db_name + '.db'
         try:
-            self.connection = sqlite3.connect(filepath)
+            self.connection = sqlite3.connect(filepath ,check_same_thread = False)
             print(self.connection)
         except sqlite3.Error as e:
             print("Error connecting to the database:", str(e))
