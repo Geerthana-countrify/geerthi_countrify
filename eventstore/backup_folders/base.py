@@ -74,6 +74,8 @@ class Repository(ABC):
     def rollback(self):
         self.connection.rollback()
         pass    
+    
+    
 
 
 

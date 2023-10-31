@@ -10,11 +10,12 @@ python = "^3.10"
 requests = "2.26.0"
 flask = "^3.0.0"
 mysql-connector-python = "^8.1.0"
-
+countrifyplatform = { git = "ssh://git@github.com/countrifyapp/platform.git", rev = "master" }
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
 
 
 

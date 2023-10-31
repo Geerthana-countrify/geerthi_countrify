@@ -1,7 +1,7 @@
-from infrastructure.base import UnitOfWork , Repository
+from countrifyplatform.abc.infrastructure import AbstractRepository, AbstractUnitOfWork
 import mysql.connector
 
-class MySQLUnitOfWork(UnitOfWork):
+class MySQLUnitOfWork(AbstractUnitOfWork):
     _instance = None
     def __new__(cls, host, user, password, database):
         if cls._instance is None:
@@ -12,9 +12,10 @@ class MySQLUnitOfWork(UnitOfWork):
             cls._instance.user = user
             cls._instance.password = password
             cls._instance.database = database
-        if cls._instance.connection is None:
-            cls._instance.connect()
         return cls._instance
+    
+    def __init__(self,host, user, password, database):
+        pass
     
     def connect(self):
         try:
@@ -33,3 +34,87 @@ class MySQLUnitOfWork(UnitOfWork):
                 self.connection = None 
             except mysql.connector.Error as e:
                 print("Error closing the database:", str(e))
+
+    def get_repository(self):
+        return MySQLRepository(self.connection)
+    
+    def commit(self):
+        self.connection.commit()
+        pass
+    def rollback(self):
+        self.connection.rollback()
+        pass 
+
+    def __enter__(self):
+        self.connect()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_val is not None:
+            self.rollback() 
+        else:
+            self.commit()
+        self.disconnect()
+ 
+
+
+class MySQLRepository(AbstractRepository):
+    def __init__(self, connection):
+        self.connection = connection
+
+    def add(self, query, value=None):
+        cursor = self.connection.cursor()
+        try:
+            if value is None:
+                cursor.execute(query)
+            else:
+                cursor.execute(query, value)
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            cursor.close()
+
+    def get(self, query, value=None):
+        print(self.connection)
+        cursor = self.connection.cursor()
+        print(cursor)
+        try:
+            if value is None:
+                cursor.execute(query)
+            else:
+                cursor.execute(query, value)
+            result = cursor.fetchone()
+            if result is None:
+                return None
+            return result
+
+        except Exception as e:
+            print(f"Error: {e}")
+            return None
+        finally:
+            cursor.close()
+
+    def update(self, query, value=None):
+        cursor = self.connection.cursor()
+        try:
+            if value is None:
+                cursor.execute(query)
+            else:
+                cursor.execute(query, value)
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            cursor.close()         
+
+
+    def delete(self, query, value=None):
+        cursor = self.connection.cursor()
+        try:
+            if value is None:
+                cursor.execute(query)
+            else:
+                cursor.execute(query, value)
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            cursor.close()        
